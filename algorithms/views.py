@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .managers.AlgorithmManager import handle_fibonacci, validate_input, handle_factorial
+from .managers.AlgorithmManager import handle_fibonacci, validate_input, handle_factorial, handle_ackermann
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -46,10 +46,27 @@ def fibonacci(request):
 @api_view(["GET", "POST"])
 def ackermann(request):
     try:
-        print(request.data)
-        return Response(status=status.HTTP_200_OK)
+        m = request.data.get("m")
+        n = request.data.get("n")
+        validate_input(m, 0)
+        validate_input(n, 0)
+        m, n = int(m), int(n)
+        ackermann_result = handle_ackermann(m, n)
+        return Response(status=status.HTTP_200_OK,
+                        data={"status": True, "result": ackermann_result, "message": "Success"})
+
+    except TypeError as te:
+        print(str(te))
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        data={"message": f"TypeError. {str(te)}", "status": False})
+    except ValueError as ve:
+        print(str(ve))
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        data={"message": f"ValueError. {str(ve)}", "status": False})
     except Exception as e:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        print(str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={"status": False, "message": f"Exception occurred. {e}"})
 
 
 @api_view(["GET", "POST"])

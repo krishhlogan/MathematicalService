@@ -131,8 +131,38 @@ def handle_fibonacci(number):
     return get_nth_fibonacci(number)
 
 
-def handle_ackermann(number):
-    pass
+def get_non_starting_result(n, rows, cols, cache):
+    r = rows - 1
+    c = cache[rows][cols - 1]
+    if r == 0:
+        ans = c + 1
+    elif c <= n:
+        ans = cache[rows - 1][cache[rows][cols - 1]]
+    else:
+        ans = (c - n) * r + cache[r][n]
+    return ans
+
+
+def get_ackermann(m, n):
+    cache_repo = get_cache_repository()
+    cache_result = cache_repo.hget(ACKERMANN_REDIS_KEY_PREFIX, f"{m}-{n}")
+    if cache_result:
+        return int(cache_result)
+    cache = [[0 for _ in range(n + 1)] for _ in range(m + 1)]
+    for rows in range(m + 1):
+        for cols in range(n + 1):
+            if rows == 0:
+                cache[rows][cols] = cols + 1
+            elif cols == 0:
+                cache[rows][cols] = cache[rows - 1][1]
+            else:
+                cache[rows][cols] = get_non_starting_result(n, rows, cols, cache)
+    cache_repo.hset(ACKERMANN_REDIS_KEY_PREFIX, f"{m}-{n}", cache[m][n])
+    return cache[m][n]
+
+
+def handle_ackermann(m, n):
+    return get_ackermann(m, n)
 
 
 def get_factorial(number):
