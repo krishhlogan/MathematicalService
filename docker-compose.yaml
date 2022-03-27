@@ -4,7 +4,11 @@ services:
     command: >
       sh -c "python manage.py collectstatic --noinput &&
                    python manage.py migrate &&
-                   gunicorn MathematicalService.wsgi:application --bind 0.0.0.0:8000"
+                   gunicorn MathematicalService.wsgi:application --reload --log-level INFO --bind 0.0.0.0:8000"
+#    command: >
+#      sh -c "python manage.py collectstatic --noinput &&
+#                   python manage.py migrate &&
+#                   python manage.py runserver"
     volumes:
       - .:/app/
     ports:
@@ -19,7 +23,7 @@ services:
     ports:
       - 6379:6379
     command: >
-      sh -c "redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}"
+      sh -c "redis-server --save 20 1 --loglevel WARNING --requirepass ${REDIS_PASSWORD}"
     env_file:
       - .env.dev
     volumes:
