@@ -2,6 +2,7 @@ import logging
 import os
 from .CacheManager import CacheRepository
 import math
+
 FIBONACCI_REDIS_KEY_PREFIX = os.environ.get('FIBONACCI_REDIS_KEY_PREFIX')
 ACKERMANN_REDIS_KEY_PREFIX = os.environ.get('ACKERMANN_REDIS_KEY_PREFIX')
 FACTORIAL_REDIS_KEY_PREFIX = os.environ.get('FACTORIAL_REDIS_KEY_PREFIX')
@@ -43,7 +44,7 @@ def return_infinity(start, end, cache_key):
         infinity_limit = int(os.getenv('FACTORIAL_INFINITY_LIMIT'))
     else:
         infinity_limit = int(os.getenv('ACKERMANN_INFINITY_LIMIT'))
-    return True if end-start > infinity_limit else False
+    return True if end - start > infinity_limit else False
 
 
 def get_last_two_numbers(keys):
@@ -55,7 +56,7 @@ def get_last_two_numbers(keys):
 
 def get_last_number(keys):
     if len(keys) == 0:
-        return 2, 2
+        return 1, 1
     else:
         print(keys[-1])
         return int(keys[-1]), int(get_cache_repository().hget(FACTORIAL_REDIS_KEY_PREFIX, keys[-1]))
@@ -106,7 +107,7 @@ def get_nth_fibonacci(number):
 
 
 def get_nth_factorial(number):
-    if number < 0:
+    if number == 0:
         return 0
     cache_repo = get_cache_repository()
     cache_result = cache_repo.hget(FACTORIAL_REDIS_KEY_PREFIX, number)
@@ -134,5 +135,30 @@ def handle_ackermann(number):
     pass
 
 
+def get_factorial(number):
+    cache_repo = get_cache_repository()
+    cache_result = cache_repo.hget(FACTORIAL_REDIS_KEY_PREFIX, number)
+    if cache_result:
+        return int(cache_result)
+    if number == 0 or number == 1:
+        cache_repo.hset(FACTORIAL_REDIS_KEY_PREFIX, number, 1)
+        return 1
+    else:
+        last_idx, factorialSoFar = get_nearest_idx_from_cache(number, FACTORIAL_REDIS_KEY_PREFIX)
+        left = last_idx
+        right = number
+        fact = factorialSoFar
+        while left <= right:
+            if left == right:
+                fact *= left
+            else:
+                fact *= left
+                fact *= right
+            left += 1
+            right -= 1
+    cache_repo.hset(FACTORIAL_REDIS_KEY_PREFIX, number, fact)
+    return fact
+
+
 def handle_factorial(number):
-    return get_nth_factorial(number)
+    return get_factorial(number)
