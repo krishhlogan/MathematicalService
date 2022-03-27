@@ -1,7 +1,5 @@
-import logging
 import os
 from .CacheManager import CacheRepository
-import math
 
 FIBONACCI_REDIS_KEY_PREFIX = os.environ.get('FIBONACCI_REDIS_KEY_PREFIX')
 ACKERMANN_REDIS_KEY_PREFIX = os.environ.get('ACKERMANN_REDIS_KEY_PREFIX')
@@ -54,14 +52,6 @@ def get_last_two_numbers(keys):
         return []
 
 
-def get_last_number(keys):
-    if len(keys) == 0:
-        return 1, 1
-    else:
-        print(keys[-1])
-        return int(keys[-1]), int(get_cache_repository().hget(FACTORIAL_REDIS_KEY_PREFIX, keys[-1]))
-
-
 def get_nearest_idx_from_cache(number, cache_name):
     cache_repo = get_cache_repository()
     filtered_keys = get_filtered_keys(number, cache_repo.hkeys(cache_name, natural_sort=True))
@@ -104,6 +94,14 @@ def get_nth_fibonacci(number):
         return last_two[1]
     else:
         return last_two[0]
+
+
+def get_last_number(keys):
+    if len(keys) == 0:
+        return 1, 1
+    else:
+        print(keys[-1])
+        return int(keys[-1]), int(get_cache_repository().hget(FACTORIAL_REDIS_KEY_PREFIX, keys[-1]))
 
 
 def get_nth_factorial(number):
