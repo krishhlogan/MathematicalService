@@ -1,12 +1,14 @@
 import os
+import logging
 from .CacheManager import CacheRepository
-from ..views import logger
 
 FIBONACCI_REDIS_KEY_PREFIX = os.environ.get('FIBONACCI_REDIS_KEY_PREFIX')
 ACKERMANN_REDIS_KEY_PREFIX = os.environ.get('ACKERMANN_REDIS_KEY_PREFIX')
 FACTORIAL_REDIS_KEY_PREFIX = os.environ.get('FACTORIAL_REDIS_KEY_PREFIX')
 
 INFINITY = 'infinity'
+
+logger = logging.getLogger('django')
 
 
 def get_cache_repository():

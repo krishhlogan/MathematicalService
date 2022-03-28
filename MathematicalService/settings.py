@@ -143,7 +143,7 @@ LOGGING = {
         'file': {
             'level': os.environ.get('LOG_LEVEL', 'DEBUG'),
             'class': 'logging.FileHandler',
-            'filename': os.environ.get('LOG_PATH', 'logs/info.log'),
+            'filename': os.path.join(os.environ.get('LOG_PATH', 'logs'),'info_logs.logs'),
             'formatter': 'verbose'
         }
     },
