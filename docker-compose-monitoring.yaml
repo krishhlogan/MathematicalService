@@ -15,7 +15,7 @@ services:
  redis-exporter:
   image: oliver006/redis_exporter:v1.6.0-alpine
   ports:
-   - 9121:9121
+   - "9121:9121"
   command:
    - "--redis.addr=redis://${REDIS_URL}"
    - "--redis.password=${REDIS_PASSWORD}"
@@ -33,4 +33,6 @@ services:
     - cache:/data
 volumes:
   cache:
+    driver: local
+  prometheus:
     driver: local
