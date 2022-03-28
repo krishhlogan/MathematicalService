@@ -1,9 +1,12 @@
 import os
 from .CacheManager import CacheRepository
+from ..views import logger
 
 FIBONACCI_REDIS_KEY_PREFIX = os.environ.get('FIBONACCI_REDIS_KEY_PREFIX')
 ACKERMANN_REDIS_KEY_PREFIX = os.environ.get('ACKERMANN_REDIS_KEY_PREFIX')
 FACTORIAL_REDIS_KEY_PREFIX = os.environ.get('FACTORIAL_REDIS_KEY_PREFIX')
+
+INFINITY = 'infinity'
 
 
 def get_cache_repository():
@@ -41,7 +44,10 @@ def return_infinity(start, end, cache_key):
     elif cache_key == FIBONACCI_REDIS_KEY_PREFIX:
         infinity_limit = int(os.getenv('FACTORIAL_INFINITY_LIMIT'))
     else:
-        infinity_limit = int(os.getenv('ACKERMANN_INFINITY_LIMIT'))
+        infinity_limit_m = int(os.getenv('ACKERMANN_INFINITY_LIMIT_M'))
+        infinity_limit_n = int(os.getenv('ACKERMANN_INFINITY_LIMIT_N'))
+        if start > infinity_limit_m or end > infinity_limit_n:
+            return True
     return True if end - start > infinity_limit else False
 
 
@@ -81,7 +87,8 @@ def get_nth_fibonacci(number):
         last_two = [0, 1]
         counter = 3
     if return_infinity(counter, number, FIBONACCI_REDIS_KEY_PREFIX):
-        return 'infinity'
+        logger.info(f"Input value: {number} is too large. Nearest fibonacci index is: {counter - 1}")
+        return INFINITY
 
     while counter <= number:
         next_fib = last_two[0] + last_two[1]
@@ -117,7 +124,8 @@ def get_nth_factorial(number):
     else:
         start_idx, fact = get_nearest_idx_from_cache(number, FACTORIAL_REDIS_KEY_PREFIX)
         if return_infinity(start_idx, number, FACTORIAL_REDIS_KEY_PREFIX):
-            return 'infinity'
+            logger.info(f"Number: {number} too large to compute. Nearest factorial found is for number: ${start_idx}")
+            return INFINITY
 
         for idx in range(start_idx + 1, number + 1):
             fact *= idx
@@ -146,6 +154,9 @@ def get_ackermann(m, n):
     cache_result = cache_repo.hget(ACKERMANN_REDIS_KEY_PREFIX, f"{m}-{n}")
     if cache_result:
         return int(cache_result)
+    if return_infinity(m, n, ACKERMANN_REDIS_KEY_PREFIX):
+        logger.info(f"Values(m={m},n={n}) passed are too large")
+        return INFINITY
     cache = [[0 for _ in range(n + 1)] for _ in range(m + 1)]
     for rows in range(m + 1):
         for cols in range(n + 1):

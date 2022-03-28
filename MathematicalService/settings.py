@@ -100,9 +100,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -144,16 +141,16 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': os.environ.get('LOG_LEVEL', 'DEBUG'),
             'class': 'logging.FileHandler',
-            'filename': 'logs/info.log',
+            'filename': os.environ.get('LOG_PATH', 'logs/info.log'),
             'formatter': 'verbose'
         }
     },
     'loggers': {
         'django': {
             'handlers': ['file'],
-            'level': 'DEBUG',
+            'level': os.environ.get('LOG_LEVEL', 'DEBUG'),
             'propagate': True
         }
     }

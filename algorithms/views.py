@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+import redis
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,14 +9,12 @@ from rest_framework.response import Response
 from .managers.AlgorithmManager import handle_fibonacci, validate_input, handle_factorial, handle_ackermann
 
 # Get an instance of a logger
-logger = logging.getLogger(__name__)
-
-
-# Create your views here.
+logger = logging.getLogger('django')
 
 
 @api_view(["GET"])
 def health_check(request):
+    logger.info(f"Healthcheck success")
     return Response(status=status.HTTP_200_OK, data={"message": f"PING! {datetime.now()}", "status": True})
 
 
@@ -30,15 +29,19 @@ def fibonacci(request):
                         data={"status": True, "result": fibonacci_number, "message": "Success"})
 
     except TypeError as te:
-        print(str(te))
+        logger.error(msg=f"TypeError. Request data: {request.data}.", exc_info=te)
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         data={"message": f"TypeError. {str(te)}", "status": False})
     except ValueError as ve:
-        print(str(ve))
+        logger.error(msg=f"ValueError. Request data: {request.data}.", exc_info=ve)
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         data={"message": f"ValueError. {str(ve)}", "status": False})
+    except redis.exceptions.ConnectionError as ce:
+        logger.critical(msg=f"Connection error. Request data: {request.data}.", exc_info=ce)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={"status": False, "message": f"Exception occurred. {str(ce)}"})
     except Exception as e:
-        print(str(e))
+        logger.error(msg=f"Exception, while calculating fibonacci. Request data: {request.data}.", exc_info=e)
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={"status": False, "message": f"Exception occurred. {e}"})
 
@@ -56,15 +59,19 @@ def ackermann(request):
                         data={"status": True, "result": ackermann_result, "message": "Success"})
 
     except TypeError as te:
-        print(str(te))
+        logger.error(msg=f"TypeError. Request data: {request.data}.", exc_info=te)
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         data={"message": f"TypeError. {str(te)}", "status": False})
     except ValueError as ve:
-        print(str(ve))
+        logger.error(msg=f"ValueError. Request data: {request.data}.", exc_info=ve)
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         data={"message": f"ValueError. {str(ve)}", "status": False})
+    except redis.exceptions.ConnectionError as ce:
+        logger.critical(msg=f"Connection error. Request data: {request.data}.", exc_info=ce)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={"status": False, "message": f"Exception occurred. {str(ce)}"})
     except Exception as e:
-        print(str(e))
+        logger.error(msg=f"Exception, while calculating fibonacci. Request data: {request.data}.", exc_info=e)
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={"status": False, "message": f"Exception occurred. {e}"})
 
@@ -78,16 +85,20 @@ def factorial(request):
         factorial_result = handle_factorial(number)
         return Response(status=status.HTTP_200_OK,
                         data={"status": True, "result": factorial_result, "message": "Success"})
-
     except TypeError as te:
-        print(str(te))
+        logger.error(msg=f"TypeError. Request data: {request.data}.", exc_info=te)
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         data={"message": f"TypeError. {str(te)}", "status": False})
     except ValueError as ve:
-        print(str(ve))
+        logger.error(msg=f"ValueError. Request data: {request.data}.", exc_info=ve)
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         data={"message": f"ValueError. {str(ve)}", "status": False})
+    except ConnectionError as ce:
+        logger.critical(msg=f"Connection error. Request data: {request.data}.", exc_info=ce)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={"status": False, "message": f"Exception occurred. {str(ce)}"})
     except Exception as e:
-        print(str(e))
+        logger.error(msg=f"Exception, while calculating fibonacci. Request data: {request.data}.", exc_info=e)
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={"status": False, "message": f"Exception occurred. {e}"})
+
