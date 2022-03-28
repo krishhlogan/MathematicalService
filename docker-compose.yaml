@@ -5,10 +5,6 @@ services:
       sh -c "python manage.py collectstatic --noinput &&
                    python manage.py migrate &&
                    gunicorn MathematicalService.wsgi:application --reload --log-level INFO --bind 0.0.0.0:8000"
-#    command: >
-#      sh -c "python manage.py collectstatic --noinput &&
-#                   python manage.py migrate &&
-#                   python manage.py runserver"
     volumes:
       - .:/app/
     ports:

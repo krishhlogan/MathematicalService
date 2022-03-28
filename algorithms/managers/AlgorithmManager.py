@@ -1,7 +1,5 @@
-import logging
 import os
 from .CacheManager import CacheRepository
-import math
 
 FIBONACCI_REDIS_KEY_PREFIX = os.environ.get('FIBONACCI_REDIS_KEY_PREFIX')
 ACKERMANN_REDIS_KEY_PREFIX = os.environ.get('ACKERMANN_REDIS_KEY_PREFIX')
@@ -54,14 +52,6 @@ def get_last_two_numbers(keys):
         return []
 
 
-def get_last_number(keys):
-    if len(keys) == 0:
-        return 1, 1
-    else:
-        print(keys[-1])
-        return int(keys[-1]), int(get_cache_repository().hget(FACTORIAL_REDIS_KEY_PREFIX, keys[-1]))
-
-
 def get_nearest_idx_from_cache(number, cache_name):
     cache_repo = get_cache_repository()
     filtered_keys = get_filtered_keys(number, cache_repo.hkeys(cache_name, natural_sort=True))
@@ -106,6 +96,14 @@ def get_nth_fibonacci(number):
         return last_two[0]
 
 
+def get_last_number(keys):
+    if len(keys) == 0:
+        return 1, 1
+    else:
+        print(keys[-1])
+        return int(keys[-1]), int(get_cache_repository().hget(FACTORIAL_REDIS_KEY_PREFIX, keys[-1]))
+
+
 def get_nth_factorial(number):
     if number == 0:
         return 0
@@ -131,8 +129,38 @@ def handle_fibonacci(number):
     return get_nth_fibonacci(number)
 
 
-def handle_ackermann(number):
-    pass
+def get_non_starting_result(n, rows, cols, cache):
+    r = rows - 1
+    c = cache[rows][cols - 1]
+    if r == 0:
+        ans = c + 1
+    elif c <= n:
+        ans = cache[rows - 1][cache[rows][cols - 1]]
+    else:
+        ans = (c - n) * r + cache[r][n]
+    return ans
+
+
+def get_ackermann(m, n):
+    cache_repo = get_cache_repository()
+    cache_result = cache_repo.hget(ACKERMANN_REDIS_KEY_PREFIX, f"{m}-{n}")
+    if cache_result:
+        return int(cache_result)
+    cache = [[0 for _ in range(n + 1)] for _ in range(m + 1)]
+    for rows in range(m + 1):
+        for cols in range(n + 1):
+            if rows == 0:
+                cache[rows][cols] = cols + 1
+            elif cols == 0:
+                cache[rows][cols] = cache[rows - 1][1]
+            else:
+                cache[rows][cols] = get_non_starting_result(n, rows, cols, cache)
+    cache_repo.hset(ACKERMANN_REDIS_KEY_PREFIX, f"{m}-{n}", cache[m][n])
+    return cache[m][n]
+
+
+def handle_ackermann(m, n):
+    return get_ackermann(m, n)
 
 
 def get_factorial(number):
