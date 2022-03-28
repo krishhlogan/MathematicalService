@@ -24,7 +24,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(" ")
 
 # Application definition
 
@@ -143,7 +143,7 @@ LOGGING = {
         'file': {
             'level': os.environ.get('LOG_LEVEL', 'DEBUG'),
             'class': 'logging.FileHandler',
-            'filename': os.path.join(os.environ.get('LOG_PATH', 'logs'),'info_logs.logs'),
+            'filename': os.path.join(os.environ.get('LOG_PATH', 'logs'), 'info_logs.logs'),
             'formatter': 'verbose'
         }
     },

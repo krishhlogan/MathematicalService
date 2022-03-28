@@ -43,13 +43,15 @@ def get_valid_cache_keys(keys):
 def return_infinity(start, end, cache_key):
     if cache_key == FIBONACCI_REDIS_KEY_PREFIX:
         infinity_limit = int(os.getenv('FIBONACCI_INFINITY_LIMIT'))
-    elif cache_key == FIBONACCI_REDIS_KEY_PREFIX:
+    elif cache_key == FACTORIAL_REDIS_KEY_PREFIX:
         infinity_limit = int(os.getenv('FACTORIAL_INFINITY_LIMIT'))
     else:
         infinity_limit_m = int(os.getenv('ACKERMANN_INFINITY_LIMIT_M'))
         infinity_limit_n = int(os.getenv('ACKERMANN_INFINITY_LIMIT_N'))
         if start > infinity_limit_m or end > infinity_limit_n:
             return True
+        else:
+            return False
     return True if end - start > infinity_limit else False
 
 
@@ -76,7 +78,7 @@ def get_nth_fibonacci(number):
     cachedResult = cacheRepo.hget(FIBONACCI_REDIS_KEY_PREFIX, number)
 
     if cachedResult:
-        return cachedResult
+        return int(cachedResult)
 
     nearest_keys = get_nearest_idx_from_cache(number, FIBONACCI_REDIS_KEY_PREFIX)
 
@@ -113,26 +115,26 @@ def get_last_number(keys):
         return int(keys[-1]), int(get_cache_repository().hget(FACTORIAL_REDIS_KEY_PREFIX, keys[-1]))
 
 
-def get_nth_factorial(number):
-    if number == 0:
-        return 0
-    cache_repo = get_cache_repository()
-    cache_result = cache_repo.hget(FACTORIAL_REDIS_KEY_PREFIX, number)
-    if cache_result:
-        return int(cache_result)
-    if number == 0 or number == 1:
-        cache_repo.hset(FACTORIAL_REDIS_KEY_PREFIX, number, 1)
-        return 1
-    else:
-        start_idx, fact = get_nearest_idx_from_cache(number, FACTORIAL_REDIS_KEY_PREFIX)
-        if return_infinity(start_idx, number, FACTORIAL_REDIS_KEY_PREFIX):
-            logger.info(f"Number: {number} too large to compute. Nearest factorial found is for number: ${start_idx}")
-            return INFINITY
-
-        for idx in range(start_idx + 1, number + 1):
-            fact *= idx
-            cache_repo.hset(FACTORIAL_REDIS_KEY_PREFIX, idx, fact)
-        return fact
+# def get_nth_factorial(number):
+#     if number == 0:
+#         return 0
+#     cache_repo = get_cache_repository()
+#     cache_result = cache_repo.hget(FACTORIAL_REDIS_KEY_PREFIX, number)
+#     if cache_result:
+#         return int(cache_result)
+#     if number == 0 or number == 1:
+#         cache_repo.hset(FACTORIAL_REDIS_KEY_PREFIX, number, 1)
+#         return 1
+#     else:
+#         start_idx, fact = get_nearest_idx_from_cache(number, FACTORIAL_REDIS_KEY_PREFIX)
+#         if return_infinity(start_idx, number, FACTORIAL_REDIS_KEY_PREFIX):
+#             logger.info(f"Number: {number} too large to compute. Nearest factorial found is for number: ${start_idx}")
+#             return INFINITY
+#
+#         for idx in range(start_idx + 1, number + 1):
+#             fact *= idx
+#             cache_repo.hset(FACTORIAL_REDIS_KEY_PREFIX, idx, fact)
+#         return fact
 
 
 def handle_fibonacci(number):
@@ -186,6 +188,10 @@ def get_factorial(number):
         return 1
     else:
         last_idx, factorialSoFar = get_nearest_idx_from_cache(number, FACTORIAL_REDIS_KEY_PREFIX)
+        if return_infinity(last_idx, number, FACTORIAL_REDIS_KEY_PREFIX):
+            logger.info(f"Number: {number} too large to compute. Nearest factorial found is for number: ${last_idx}")
+            return INFINITY
+
         left = last_idx
         right = number
         fact = factorialSoFar
