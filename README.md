@@ -54,7 +54,21 @@ curl --request POST \
   --data '{"number":2000}'
 ```
 
-How to proceed further and deploy them to cloud ?
+Below commands can be used to loadtest the endpoints.
+
+For docs on loadtest follow this link: https://www.npmjs.com/package/loadtest
+ ```
+ loadtest 'http://host.docker.internal/algorithm/fibonacci/' -m POST -H Content-Type:application/json -T application/json -c 10 --rps 100 -P '{\"number\":1000}' -n 5000
+ ```
+
+ ```
+ loadtest 'http://host.docker.internal/algorithm/factorial/' -m POST -H Content-Type:application/json -T application/json -c 10 --rps 100 -P '{\"number\":1000}' -n 5000
+ ```
+
+ ```
+ loadtest 'http://host.docker.internal/algorithm/ackermann/' -m POST -H Content-Type:application/json -T application/json -c 10 --rps 100 -P '{\"m\":100,\"n\":10}' -n 5000
+ ```
+#How to proceed further and deploy them to cloud ?
 
 Push the docker images to any private docker registry.
 
