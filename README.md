@@ -22,6 +22,9 @@ One can follow below docs to add data-source
 
 https://prometheus.io/docs/visualization/grafana/
 
+Prometheus Url:
+http://host.docker.internal:9090/
+
 # Sample Curls for API
 
 ACKERMANN
