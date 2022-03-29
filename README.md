@@ -21,3 +21,32 @@ The first time, we would have to add prometheus as data-source.
 One can follow below docs to add data-source
 
 https://prometheus.io/docs/visualization/grafana/
+
+# Sample Curls for API
+
+ACKERMANN
+```
+curl --request POST \
+  --url http://host.docker.internal/algorithm/ackermann/ \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"m" : 100,
+	"n" : 10
+}'
+```
+FIBONACCI
+```
+curl --request POST \
+  --url http://host.docker.internal/algorithm/fibonacci/ \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"number": 10
+}'
+```
+FACTORIAL
+```
+curl --request POST \
+  --url http://host.docker.internal/algorithm/factorial/ \
+  --header 'Content-Type: application/json' \
+  --data '{"number":2000}'
+```
