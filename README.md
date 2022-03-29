@@ -16,3 +16,4 @@ Couple of dashboards for monitoring are added inside ```/grafana``` folder at ro
 They can be easily imported from grafana. 
 For reference: https://grafana.com/docs/grafana/latest/dashboards/export-import/
 
+By default, username/password of grafana is admin/admin
