@@ -1,12 +1,11 @@
 import redis
 
-from ..DAO.RedisDao import get_connection
 import os
 
 
 class CacheRepository:
     def __init__(self):
-        connection_url = f"redis://:{os.environ.get('REDIS_PASSWORD')}@{os.environ.get('REDIS_URL')}"
+        connection_url = f"redis://:{os.environ.get('REDIS_PASSWORD')}@{os.environ.get('REDIS_URL')}:{os.environ.get('REDIS_PORT')}"
         self.connection = redis.from_url(connection_url)
 
     def hset(self, name, key, value=None, mapping=None):

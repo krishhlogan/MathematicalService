@@ -82,7 +82,7 @@ class AlgorithmsTest(TestCase):
         self.assertEqual(response['status'], False)
 
     def test_ackermann_large_number(self):
-        """test large factorial number"""
+        """test large ackermann number"""
         response = self.client.post(path='http://127.0.0.1:8000/algorithm/ackermann/', data={'m': 5,'n': 7})
         self.assertEqual(response.status_code, 200)
         response = response.json()
