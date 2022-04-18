@@ -38,7 +38,7 @@ services:
     ports:
       - $REDIS_EXPORTER_PORT:9121
     command:
-      - "--redis.addr=redis://${REDIS_URL}:${REDIS_PORT}"
+      - "--redis.addr=redis://${REDIS_URL}"
       - "--redis.password=${REDIS_PASSWORD}"
     depends_on:
       - cache

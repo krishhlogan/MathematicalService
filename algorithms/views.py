@@ -102,3 +102,10 @@ def factorial(request):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={"status": False, "message": f"Exception occurred. {e}"})
 
+
+@api_view(["GET"])
+def flush_cache(request):
+    from .managers.CacheManager import CacheRepository
+    CacheRepository().connection.flushall()
+    return Response(status=status.HTTP_200_OK,
+                        data={"status": True, "result": True, "message": "Success"})
